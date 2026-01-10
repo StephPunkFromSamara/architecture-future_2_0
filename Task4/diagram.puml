@@ -1,0 +1,54 @@
+@startuml
+title Component Diagram — Deployment Automation (Project)
+
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor<<Terraform>> #D6EAF8
+  BackgroundColor<<Manual>> #FAD7A0
+}
+
+' ==== TERRAFORM ====
+component "Terraform" <<Terraform>> {
+  component "Terraform Configs"
+  component "Terraform State"
+}
+
+' ==== CLOUD ====
+package "Cloud Infrastructure (ru-central1-a)" {
+
+  component "VPC Network" <<Terraform>>
+  component "Subnet (ru-central1-a)" <<Terraform>>
+  component "NAT Gateway" <<Terraform>>
+  component "VPN Network" <<Terraform>>
+
+  component "Virtual Machine (Linux)" <<Terraform>> {
+      component "Boot Disk" <<Terraform>>
+
+      component "Docker" <<Manual>>
+      component "Kubernetes" <<Manual>>
+
+      component "PostgreSQL" <<Manual>>
+      component "MS SQL Server" <<Manual>>
+  }
+}
+
+' ==== RELATIONS ====
+"Terraform" --> "VPC Network" : provisions
+"Terraform" --> "Subnet (ru-central1-a)" : provisions
+"Terraform" --> "NAT Gateway" : provisions
+"Terraform" --> "VPN Network" : provisions
+"Terraform" --> "Virtual Machine (Linux)" : provisions
+"Terraform" --> "Boot Disk" : attaches
+
+"Docker" --> "Virtual Machine (Linux)"
+"Kubernetes" --> "Docker"
+"PostgreSQL" --> "Virtual Machine (Linux)"
+"MS SQL Server" --> "Virtual Machine (Linux)"
+
+note right of "Virtual Machine (Linux)"
+CPU: 2 cores
+RAM: 2 GB
+OS: Linux
+end note
+
+@enduml

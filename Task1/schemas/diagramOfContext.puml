@@ -1,0 +1,41 @@
+@startuml
+!include C4_Context.puml
+
+Person(operator, "Operator", "Оператор медицинской платформы")
+Person(user, "Пользователь банковских секторов", "Клиент")
+
+
+System(bankSystem, "Банковская система", "Предоставляет данных системы")
+System(portalSelf, "Система самообслуживания", "Позволяет записываться пользователю")
+System(mlSystem, "Сервисы машинного обучения для формирования рекомендаций ")
+System(crmSystem, "Внутренняя CRM-система", "Внутренние финансовые данные/управление клиниками/данные клиента")
+System(biSystem, "Система отчетности", "Отчеты из DWH-системы ")
+System(dwhSystem, "Система данных отчетности","DWH-система")
+System(dlhSystem, "Хранилище данных","DataLakeHouse-система")
+System(integrationLayer, "Интеграционная шина Apache Camel","Интегрирует данные в DWH")
+
+Rel(operator,portalSelf, "Использование портала")
+Rel(portalSelf,biSystem, "Получение отчетов")
+Rel(dwhSystem,biSystem, "Полученные данных для отчетов")
+Rel(dlhSystem,dwhSystem, "Получение данных для структуризации данных")
+Rel(integrationLayer,dlhSystem, "Интеграция данных от прикладных систем")
+Rel(mlSystem,dlhSystem, "Получение данных для обучения данных")
+Rel(user,bankSystem, "Получение банковских услуг")
+Rel(operator,crmSystem, "Загрузка данных клиентов")
+Rel(crmSystem,integrationLayer, "Отправка обезличенных данных о клиентах/клиниках и тд")
+Rel(bankSystem,integrationLayer, "Обезличенных данных")
+Rel(bankSystem,crmSystem, "Обмен платежной и клиентской информацией")
+
+@enduml
+
+
+
+
+/*
+DWH на базе Microsoft SQL-сервера 2008 года;
+Power BI;
+Power Builder;
+Шина на базе Apache Camel;
+ИИ-сервисы на Python;
+Финтех-сервисы на Golang и Java.
+*/

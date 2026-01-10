@@ -1,0 +1,60 @@
+ @startuml
+ !include C4_Container.puml
+ Person(operator, "Operator", "Оператор медицинской платформы")
+
+ Person(user, "Пользователь банковских секторов", "Клиент")
+ System_Boundary(future, "Future 2.0") {
+
+ Container(bankSystem, "Банковская система","GO", "Предоставляет данных системы")
+ Container(bankSystemUI, "Пользовательский интерфейс","JavaScript", "Пользовательский интерфейс банковских сервисов")
+ ContainerDb(bankSystemDB, "Хранение данных финансовых операций","PostgreSQL", "Пользовательский интерфейс банковских сервисов")
+
+ ContainerQueue(broker, "Брокер сообщений", "Apache ActiveMQ","Брокер сообщений")
+
+ Container(portalSelfUI, "Система самообслуживания", "JavaScript","АРМ оператора")
+ Container(portalSelf, "Система самообслуживания", "GO","АРМ оператора")
+ ContainerDb(portalSelfDb, "Система самообслуживания", "PostgreSQL","АРМ оператора")
+
+ Container(mlSystem, "Сервис машинного обучения для формирования рекомендаций", "Python")
+
+
+ Container(crmSystem, "Внутренняя CRM-система","PowerBuilder","Внутренние финансовые данные/управление клиниками/данные клиента")
+ ContainerDb(crmSystemDB, "Внутренняя CRM-система","MSSQL", "Хранение данных внутренних систем")
+
+
+
+ Container(biSystem,"Power BI" ,"Система построения BI-отчетности", )
+ Container(dlhSystem, "Хранилище данных","Amazon S3+ Apache Iceberg","DataLakeHouse-система",)
+ Container(integrationLayer, "Интеграционная шина Apache Camel","Интегрирует данные в DWH")
+
+ Rel(bankSystemUI,bankSystem, "Отправка данных", "REST API:JSON")
+ Rel(bankSystem,bankSystemDB, "Сохранение данных", "JDBC")
+
+ Rel(portalSelf,portalSelfDb,"Сохранение данных")
+ Rel(portalSelfUI,portalSelf,"Сохранение данных")
+
+ Rel(operator,portalSelfUI, "Использование портала")
+ Rel(portalSelf,broker, "Загрузка данных клиентов")
+ Rel(biSystem,portalSelf, "Получение отчетов")
+
+ Rel(crmSystem,crmSystemDB,"Сохранение данных crm-систем","JDBC")
+
+
+
+ Rel(dlhSystem,biSystem, "Полученные данных для отчетов")
+
+ Rel(broker,integrationLayer, "Интеграция данных от прикладных систем","Kafka Protocol")
+ Rel(dlhSystem,mlSystem,"Получение данных для обучения ML-моделей")
+
+ Rel(user,bankSystemUI, "Получение банковских услуг")
+
+ Rel(integrationLayer,dlhSystem, "Загрузка данных клиентов")
+ Rel(crmSystem,broker, "Отправка обезличенных данных о клиентах/клиниках и тд","Kafka Protocol")
+ Rel(bankSystem,broker, "Обмен платежной и клиентской информацией","Kafka Protocol")
+ }
+ @enduml
+
+
+
+
+
